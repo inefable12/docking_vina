@@ -1,0 +1,16 @@
+REMARK  Name = claudia.xyz
+REMARK  0 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ROOT
+ATOM      1  O   UNL     1       2.669  -1.076   0.009  0.00  0.00    +0.000 OA
+ATOM      2  C   UNL     1       1.632  -0.426   0.012  0.00  0.00    +0.000 C 
+ATOM      3  C   UNL     1       1.565   1.079   0.038  0.00  0.00    +0.000 C 
+ATOM      4  S   UNL     1      -0.203   1.489   0.029  0.00  0.00    +0.000 S 
+ATOM      5  C   UNL     1      -0.696  -0.181  -0.002  0.00  0.00    +0.000 C 
+ATOM      6  S   UNL     1      -2.253  -0.742  -0.023  0.00  0.00    +0.000 S 
+ATOM      7  N   UNL     1       0.391  -0.994  -0.006  0.00  0.00    +0.000 N 
+ATOM      8  H   UNL     1       0.286  -1.972  -0.023  0.00  0.00    +0.000 HD
+ENDROOT
+TORSDOF 0
