@@ -11,12 +11,12 @@ def read_config(file_path="configuracion"):
     return config
 
 # Función para guardar los valores de exhaustiveness y size en el archivo de configuración
-def save_config(exhaustiveness, size_x, size_y, size_z, file_path="configuracion"):
+def save_config(exhaustiveness, size, file_path="configuracion"):
     with open(file_path, "w") as file:
         file.write(f"receptor = receptor.pdbqt\n")
-        file.write(f"size_x = {size_x}\n")
-        file.write(f"size_y = {size_y}\n")
-        file.write(f"size_z = {size_z}\n")
+        file.write(f"size_x = {size}\n")
+        file.write(f"size_y = {size}\n")
+        file.write(f"size_z = {size}\n")
         file.write(f"center_x = -10.418\n")
         file.write(f"center_y = 79.48\n")
         file.write(f"center_z = 46.224\n")
@@ -31,17 +31,11 @@ st.title("Configuración para Docking Molecular")
 
 # Interfaz para modificar "exhaustiveness" y "size"
 exhaustiveness = st.number_input("Exhaustiveness", value=int(config.get("exhaustiveness", 8)), min_value=1)
-size_x = st.number_input("Size X", value=float(config.get("size_x", 20.0)))
-size_y = st.number_input("Size Y", value=float(config.get("size_y", 20.0)))
-size_z = st.number_input("Size Z", value=float(config.get("size_z", 20.0)))
+size = st.number_input("Size (arista del cubo)", value=float(config.get("size_x", 20.0)))
 
 if st.button("Guardar configuración"):
-    save_config(exhaustiveness, size_x, size_y, size_z)
+    save_config(exhaustiveness, size)
     st.success("Configuración guardada exitosamente.")
 
-st.write("Ejecutar Autodock Vina desde la terminal de la carpeta con los ligandos.")
-st.code("""
-for i in input_lig_pdbqt:
-    print(i)
-    !./vina --ligand {i} --config configuracion --log {i}.log
-""")
+st.write("Archivo de configuración actualizado:")
+st.code(open("configuracion", "r").read())
