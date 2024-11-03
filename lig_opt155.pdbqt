@@ -1,0 +1,25 @@
+REMARK  Name = claudia.xyz
+REMARK  1 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: C_7  and  C_8
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ROOT
+ATOM      1  O   UNL     1      -2.305  -0.981   0.795  0.00  0.00    +0.000 OA
+ATOM      2  C   UNL     1      -1.191  -0.577   0.508  0.00  0.00    +0.000 C 
+ATOM      3  N   UNL     1      -0.157  -1.337   0.071  0.00  0.00    +0.000 N 
+ATOM      4  C   UNL     1       1.027  -0.718  -0.197  0.00  0.00    +0.000 C 
+ATOM      5  O   UNL     1       2.032  -1.287  -0.591  0.00  0.00    +0.000 OA
+ATOM      6  C   UNL     1       0.907   0.743   0.066  0.00  0.00    +0.000 C 
+ATOM      7  C   UNL     1       1.941   1.563  -0.164  0.00  0.00    +0.000 C 
+ATOM      8  S   UNL     1      -0.690   1.098   0.611  0.00  0.00    +0.000 S 
+ATOM      9  H   UNL     1      -0.259  -2.309  -0.049  0.00  0.00    +0.000 HD
+ENDROOT
+BRANCH   7  10
+ATOM     10  C   UNL     1       1.936   2.974   0.034  0.00  0.00    +0.000 A 
+ATOM     11  C   UNL     1       1.403   3.753   1.049  0.00  0.00    +0.000 A 
+ATOM     12  C   UNL     1       1.635   5.148   0.869  0.00  0.00    +0.000 A 
+ATOM     13  C   UNL     1       2.356   5.405  -0.272  0.00  0.00    +0.000 A 
+ATOM     14  S   UNL     1       2.759   3.973  -1.109  0.00  0.00    +0.000 S 
+ENDBRANCH   7  10
+TORSDOF 1
