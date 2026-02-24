@@ -4,6 +4,8 @@ from vina import Vina
 
 v = Vina()
 
+ligand_files = ["lig_opt1.pdbqt","lig_opt2.pdbqt","lig_opt3.pdbqt","lig_opt4.pdbqt"]
+
 for file in ligand_files:
     v.set_receptor("receptor.pdbqt")
     v.set_ligand_from_file(file)
