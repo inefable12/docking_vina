@@ -36,7 +36,7 @@ size_x = st.sidebar.number_input("Tamaño X", value=30.0)
 size_y = st.sidebar.number_input("Tamaño Y", value=30.0)
 size_z = st.sidebar.number_input("Tamaño Z", value=30.0)
 
-exhaustiveness = st.sidebar.slider("Exhaustiveness", 1, 32, 4)
+exhaustiveness = st.sidebar.slider("Exhaustiveness", 1, 64, 4)
 n_poses = st.sidebar.slider("Número de poses", 1, 20, 1)
 
 # =========================
