@@ -4,10 +4,10 @@ from vina import Vina
 
 v = Vina()
 
-ligand_files = ["lig_opt1.pdbqt","lig_opt2.pdbqt"] #,"lig_opt3.pdbqt","lig_opt4.pdbqt"]
+ligand_files = ["ligando1.pdbqt","ligando2.pdbqt"] #,"lig_opt3.pdbqt","lig_opt4.pdbqt"]
 
 for file in ligand_files:
-    v.set_receptor("receptor.pdbqt")
+    v.set_receptor("mpro.pdbqt")
     v.set_ligand_from_file(file)
     v.compute_vina_maps([-22.194, 18.772, -24.459], [30, 30, 30])
 
@@ -22,5 +22,5 @@ for file in ligand_files:
     for i, e in enumerate(energias, start=1):
         st.write(f"Pose {i}: Afinidad = {e[0]:.2f} kcal/mol")
 
-    v.write_poses(file.replace(".pdbqt", "-resultados.pdbqt"))
+    #v.write_poses(file.replace(".pdbqt", "-resultados.pdbqt"))
 
