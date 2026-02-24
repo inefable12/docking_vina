@@ -25,6 +25,7 @@ ligand_files = st.file_uploader(
 # =========================
 # PARÁMETROS DE LA CAJA
 # =========================
+st.sidebar.image("imagenes/inDocking_icon.png", caption="Dr. Jesus Alvarado-Huayhuaz")
 
 st.sidebar.header("Parámetros de la caja de docking")
 
