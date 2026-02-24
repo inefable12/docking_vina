@@ -1,1 +1,2 @@
-vina
+streamlit
+vina == 1.2.3
