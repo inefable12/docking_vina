@@ -27,7 +27,7 @@ ligand_files = st.file_uploader(
 # =========================
 st.sidebar.image("imagenes/inDocking_icon.png", caption="Dr. Jesus Alvarado-Huayhuaz")
 
-st.sidebar.header("Parámetros de la caja de docking")
+st.sidebar.header("Parámetros del docking")
 
 center_x = st.sidebar.number_input("Centro X", value=-22.194)
 center_y = st.sidebar.number_input("Centro Y", value=18.772)
