@@ -1,41 +1,24 @@
 import streamlit as st
+import streamlit.components.v1 as components
+from vina import Vina
 
-# Función para leer el archivo de configuración y extraer los valores actuales
-def read_config(file_path="configuracion"):
-    config = {}
-    with open(file_path, "r") as file:
-        for line in file:
-            key_value = line.split("=")
-            if len(key_value) == 2:
-                config[key_value[0].strip()] = key_value[1].strip()
-    return config
+v = Vina()
 
-# Función para guardar los valores de exhaustiveness y size en el archivo de configuración
-def save_config(exhaustiveness, size, file_path="configuracion"):
-    with open(file_path, "w") as file:
-        file.write(f"receptor = receptor.pdbqt\n")
-        file.write(f"size_x = {size}\n")
-        file.write(f"size_y = {size}\n")
-        file.write(f"size_z = {size}\n")
-        file.write(f"center_x = -10.418\n")
-        file.write(f"center_y = 79.48\n")
-        file.write(f"center_z = 46.224\n")
-        file.write(f"exhaustiveness = {exhaustiveness}\n")
-        file.write(f"num_modes = 1\n")
-        file.write(f"seed = 123456\n")
+for file in ligand_files:
+    v.set_receptor("mpro.pdbqt")
+    v.set_ligand_from_file(file)
+    v.compute_vina_maps([-22.194, 18.772, -24.459], [30, 30, 30])
 
-# Cargar valores actuales del archivo de configuración
-config = read_config()
+    v.dock(
+        exhaustiveness=4,
+        n_poses=1
+    )
 
-st.title("Configuración para Docking Molecular")
+    energias = v.energies()
 
-# Interfaz para modificar "exhaustiveness" y "size"
-exhaustiveness = st.number_input("Exhaustiveness", value=int(config.get("exhaustiveness", 8)), min_value=1)
-size = st.number_input("Size (arista del cubo)", value=float(config.get("size_x", 20.0)))
+    print(f"\nLigando: {file}")
+    for i, e in enumerate(energias, start=1):
+        st.write(f"Pose {i}: Afinidad = {e[0]:.2f} kcal/mol")
 
-if st.button("Guardar configuración"):
-    save_config(exhaustiveness, size)
-    st.success("Configuración guardada exitosamente.")
+    v.write_poses(file.replace(".pdbqt", "-resultados.pdbqt"))
 
-st.write("Archivo de configuración actualizado:")
-st.code(open("configuracion", "r").read())
