@@ -2,6 +2,8 @@ import streamlit as st
 from vina import Vina
 import tempfile
 import os
+import zipfile
+from io import BytesIO
 
 st.title("Docking Molecular con AutoDock Vina")
 
@@ -35,6 +37,7 @@ size_y = st.sidebar.number_input("Tamaño Y", value=30.0)
 size_z = st.sidebar.number_input("Tamaño Z", value=30.0)
 
 exhaustiveness = st.sidebar.slider("Exhaustiveness", 1, 32, 4)
+n_poses = st.sidebar.slider("Número de poses", 1, 20, 1)
 
 # =========================
 # EJECUCIÓN DEL DOCKING
@@ -44,40 +47,76 @@ if receptor_file and ligand_files:
 
     if st.button("Ejecutar Docking"):
 
-        # Guardar receptor temporalmente
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_rec:
-            tmp_rec.write(receptor_file.read())
-            receptor_path = tmp_rec.name
+        resultados_zip = BytesIO()
 
-        for ligand in ligand_files:
+        with zipfile.ZipFile(resultados_zip, "w") as zipf:
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_lig:
-                tmp_lig.write(ligand.read())
-                ligand_path = tmp_lig.name
+            # Guardar receptor temporal
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_rec:
+                tmp_rec.write(receptor_file.read())
+                receptor_path = tmp_rec.name
 
-            v = Vina()
-            v.set_receptor(receptor_path)
-            v.set_ligand_from_file(ligand_path)
+            for ligand in ligand_files:
 
-            v.compute_vina_maps(
-                center=[center_x, center_y, center_z],
-                box_size=[size_x, size_y, size_z]
-            )
+                ligand_name = ligand.name.replace(".pdbqt", "")
 
-            v.dock(
-                exhaustiveness=exhaustiveness,
-                n_poses=1
-            )
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_lig:
+                    tmp_lig.write(ligand.read())
+                    ligand_path = tmp_lig.name
 
-            energias = v.energies()
+                v = Vina()
+                v.set_receptor(receptor_path)
+                v.set_ligand_from_file(ligand_path)
 
-            st.subheader(f"Resultados para: {ligand.name}")
+                v.compute_vina_maps(
+                    center=[center_x, center_y, center_z],
+                    box_size=[size_x, size_y, size_z]
+                )
 
-            for i, e in enumerate(energias, start=1):
-                st.write(f"Pose {i}: Afinidad = {e[0]:.2f} kcal/mol")
+                v.dock(
+                    exhaustiveness=exhaustiveness,
+                    n_poses=n_poses
+                )
 
-            # Limpieza del ligando temporal
-            os.remove(ligand_path)
+                energias = v.energies()
 
-        # Limpieza del receptor temporal
-        os.remove(receptor_path)
+                st.subheader(f"Resultados para: {ligand.name}")
+
+                log_content = f"Docking results for {ligand.name}\n\n"
+
+                for i, e in enumerate(energias, start=1):
+                    linea = f"Pose {i}: Afinidad = {e[0]:.2f} kcal/mol"
+                    st.write(linea)
+                    log_content += linea + "\n"
+
+                # =========================
+                # Guardar archivo LOG
+                # =========================
+                log_filename = f"{ligand_name}.log"
+                zipf.writestr(log_filename, log_content)
+
+                # =========================
+                # Guardar poses PDBQT
+                # =========================
+                poses_filename = f"{ligand_name}_poses.pdbqt"
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_out:
+                    v.write_poses(tmp_out.name, n_poses=n_poses)
+                    tmp_out_path = tmp_out.name
+
+                zipf.write(tmp_out_path, poses_filename)
+
+                os.remove(ligand_path)
+                os.remove(tmp_out_path)
+
+            os.remove(receptor_path)
+
+        resultados_zip.seek(0)
+
+        st.success("Docking finalizado correctamente")
+
+        st.download_button(
+            label="Descargar resultados (ZIP)",
+            data=resultados_zip,
+            file_name="resultados_docking.zip",
+            mime="application/zip"
+        )
