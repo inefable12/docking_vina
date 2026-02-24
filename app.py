@@ -5,7 +5,7 @@ from vina import Vina
 v = Vina()
 
 for file in ligand_files:
-    v.set_receptor("mpro.pdbqt")
+    v.set_receptor("receptor.pdbqt")
     v.set_ligand_from_file(file)
     v.compute_vina_maps([-22.194, 18.772, -24.459], [30, 30, 30])
 
