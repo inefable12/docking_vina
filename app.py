@@ -60,55 +60,82 @@ if receptor_file and ligand_files:
 
                 ligand_name = ligand.name.replace(".pdbqt", "")
 
+                # Guardar ligando temporal
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_lig:
                     tmp_lig.write(ligand.read())
                     ligand_path = tmp_lig.name
 
-                v = Vina()
-                v.set_receptor(receptor_path)
-                v.set_ligand_from_file(ligand_path)
+                try:
+                    v = Vina()
+                    v.set_receptor(receptor_path)
+                    v.set_ligand_from_file(ligand_path)
 
-                v.compute_vina_maps(
-                    center=[center_x, center_y, center_z],
-                    box_size=[size_x, size_y, size_z]
-                )
+                    v.compute_vina_maps(
+                        center=[center_x, center_y, center_z],
+                        box_size=[size_x, size_y, size_z]
+                    )
 
-                v.dock(
-                    exhaustiveness=exhaustiveness,
-                    n_poses=n_poses
-                )
+                    v.dock(
+                        exhaustiveness=exhaustiveness,
+                        n_poses=n_poses
+                    )
 
-                energias = v.energies()
+                    energias = v.energies()
 
-                st.subheader(f"Resultados para: {ligand.name}")
+                    # =========================
+                    # VALIDACIÓN
+                    # =========================
 
-                log_content = f"Docking results for {ligand.name}\n\n"
+                    if energias is None or len(energias) == 0:
+                        st.warning(f"No se obtuvieron poses válidas para {ligand.name}")
+                        continue
 
-                for i, e in enumerate(energias, start=1):
-                    linea = f"Pose {i}: Afinidad = {e[0]:.2f} kcal/mol"
-                    st.write(linea)
-                    log_content += linea + "\n"
+                    st.subheader(f"Resultados para: {ligand.name}")
 
-                # =========================
-                # Guardar archivo LOG
-                # =========================
-                log_filename = f"{ligand_name}.log"
-                zipf.writestr(log_filename, log_content)
+                    log_content = f"Docking results for {ligand.name}\n\n"
 
-                # =========================
-                # Guardar poses PDBQT
-                # =========================
-                poses_filename = f"{ligand_name}_poses.pdbqt"
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdbqt") as tmp_out:
-                    v.write_poses(tmp_out.name, n_poses=n_poses)
-                    tmp_out_path = tmp_out.name
+                    for i, e in enumerate(energias, start=1):
+                        linea = f"Pose {i}: Afinidad = {e[0]:.2f} kcal/mol"
+                        st.write(linea)
+                        log_content += linea + "\n"
 
-                zipf.write(tmp_out_path, poses_filename)
+                    # =========================
+                    # GUARDAR LOG
+                    # =========================
 
-                os.remove(ligand_path)
-                os.remove(tmp_out_path)
+                    log_filename = f"{ligand_name}.log"
+                    zipf.writestr(log_filename, log_content)
 
-            os.remove(receptor_path)
+                    # =========================
+                    # GUARDAR POSES
+                    # =========================
+
+                    poses_filename = f"{ligand_name}_poses.pdbqt"
+                    tmp_out_path = os.path.join(
+                        tempfile.gettempdir(),
+                        poses_filename
+                    )
+
+                    n_poses_real = min(n_poses, len(energias))
+
+                    v.write_poses(tmp_out_path, n_poses=n_poses_real)
+
+                    if os.path.exists(tmp_out_path):
+                        zipf.write(tmp_out_path, poses_filename)
+                        os.remove(tmp_out_path)
+                    else:
+                        st.warning(f"No se pudo generar archivo de poses para {ligand.name}")
+
+                except Exception as e:
+                    st.error(f"Error procesando {ligand.name}: {str(e)}")
+
+                finally:
+                    if os.path.exists(ligand_path):
+                        os.remove(ligand_path)
+
+            # Eliminar receptor temporal
+            if os.path.exists(receptor_path):
+                os.remove(receptor_path)
 
         resultados_zip.seek(0)
 
