@@ -1,2 +1,2 @@
 streamlit
-vina == 1.2.3
+vina 
